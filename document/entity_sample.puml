@@ -1,0 +1,26 @@
+@startuml entitySample
+
+entity admin_users {
+    user_id
+    user_name
+    created
+    updated
+    deleted
+}
+
+entity common_users {
+    user_id
+    user_name
+    user_mailaddress
+    created
+    updated
+    deleted
+}
+
+entity session {
+    user_id
+    session_id
+    created
+    updated
+    deleted
+}

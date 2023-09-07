@@ -1,0 +1,28 @@
+# docker-compose.nextjs.yml
+# node_modulesのインストールは別途行う,コンテナの構築とサーバーの起動のみ行う.
+version: '3'
+services:
+  react:
+    container_name: nextjs
+    image: node:18
+    volumes:
+      - ../app:/app
+    working_dir: /app
+    command: bash -c "sleep 10 && npm run dev"
+    # コンテナ作成後すぐにコマンドを実行すると失敗するため,遅延を入れている.
+    # TODO: コンテナの起動を検知し,サーバーを起動する機能追加.
+    # サーバーの起動も行いたいが,コンテナの起動が安定してからテストする.
+    ports:
+      - "3000:3000"
+    # docker-compose upでコンテナ起動後,処理終了時にコンテナを起動しっぱなしにする.
+    tty: true
+    # Docker上のNext.jsでホットリロードを使用できるようにするための環境変数設定
+    # https://www.ikkitang1211.site/entry/2020/10/11/213824
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    # deploy:
+    #  resources:
+    #    limits:
+    #      # 標準設定は無制限,ホストマシン(VirtualBox)が許す限り,リソースを使用できる.
+    #      cpus: '2'
+    #      memory: 1024M

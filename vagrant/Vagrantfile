@@ -1,0 +1,99 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/focal64"
+
+  config.vm.network "forwarded_port", guest: 3000, host: 3000
+  config.vm.network "forwarded_port", guest: 3306, host: 3306
+
+  # ホストマシンと共有するフォルダの初期設定は以下になります.
+  # config.vm.synced_folder ".", "vagrant"
+  config.vm.synced_folder "../docker", "/home/docker", create: true
+  config.vm.synced_folder "../app", "/home/app", create: true
+  config.vm.synced_folder "../ansible", "/home/ansible", create: true
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "vagrant-box" # VirtualBoxでのBox名(2つ以上建てる時はかぶらないようにすること)
+    vb.memory = 4096 # default 512 MB
+    vb.cpus = 1 # default 1 core
+    vb.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/home_app","1"]
+    # https://progedu.github.io/intro-curriculum-faq/npm.html
+    # npm installがうまく行かない原因を取り除く作業
+    # https://github.com/hashicorp/vagrant/issues/713#issuecomment-130128566
+    # ここを参考に,シンボリックリンクを設定するフォルダ(home_app)を決定した.
+  end
+
+  # コンテナ内のIPv6を無効にするDockerプロバイダ設定
+  config.vm.provider "docker" do |d|
+    d.create_args = ["--sysctl", "net.ipv6.conf.all.disable_ipv6=1"]
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    # システム更新
+    sudo apt-get update
+    sudo apt-get upgrade -y
+
+    # Docker インストール
+    if ! type docker > /dev/null 2>&1; then
+      sudo apt-get remove docker docker-engine docker.io containerd runc
+      sudo apt-get update
+      sudo apt-get install \
+          apt-transport-https \
+          ca-certificates \
+          curl \
+          gnupg \
+          lsb-release -y
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+      echo \
+        "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+      sudo apt-get update
+      sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+      # Vagrantユーザーにdocekrを追加,sudo無しでdocker ps等を打てるようになる.
+      sudo usermod -aG docker vagrant
+    fi
+
+    # Docker Compose インストール
+    if ! type docker-compose > /dev/null 2>&1; then
+      sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      sudo chmod +x /usr/local/bin/docker-compose
+    fi
+
+    # Ansible インストール
+    if ! type ansible > /dev/null 2>&1; then
+      sudo apt-get update
+      sudo apt-get install software-properties-common -y
+      sudo apt-add-repository --yes --update ppa:ansible/ansible
+      sudo apt-get install ansible -y
+    fi
+  SHELL
+
+  # 仮想マシン上にファイルを作成,もしくはあることを確認
+  config.vm.provision "shell", inline: <<-SHELL
+    cd /home
+    sudo mkdir -p docker # -p は既にフォルダがあることを許容する.
+    sudo mkdir -p ansible
+    sudo mkdir -p app
+  SHELL
+
+  # ホストマシンにnodeをインストール
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.playbook = "/home/ansible/playbook_install_node.yml"
+  end
+
+  # ホストマシンがReact用のpackageをapp/node_modulesにインストール 
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.playbook = "/home/ansible/playbook_npm_install.yml"
+  end
+
+  # Run Docker Compose files
+  # Nextjs は,vagrant実行時に起動してほしいのでrun: "always"を追加する.
+  config.vm.provision "shell", run: "always", inline: <<-SHELL
+    cd /home/docker
+    # -f : ファイル名選択のオプション,ついていない場合,デフォルトのdocker-compose.ymlが実行される.
+    # -d : バックグラウンドでの実行とする.
+    sudo docker-compose -f docker-compose.nextjs.yml up -d
+    # sudo docker-compose -f docker-compose.mysql.yml up -d
+  SHELL
+end

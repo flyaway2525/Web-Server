@@ -1,0 +1,29 @@
+---
+- name: Run npm install in a specific folder
+  hosts: localhost | all
+  become: no
+  tasks:
+    - name: Check if npm is installed
+      command: which npm
+      register: npm_check
+      ignore_errors: yes
+
+    - name: Fail if npm is not installed
+      fail:
+        msg: "npm is not installed. Please install npm first."
+      when: npm_check.rc != 0
+
+    - name: Check if package.json exists in the specific folder
+      stat:
+        path: ../app/package.json
+      register: package_json_check
+
+    - name: Fail if package.json does not exist
+      fail:
+        msg: "package.json does not exist in the specific folder. Please make sure it exists."
+      when: not package_json_check.stat.exists
+
+    - name: Run npm install
+      command: npm install
+      args:
+        chdir: ../app
