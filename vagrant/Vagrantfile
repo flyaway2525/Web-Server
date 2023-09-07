@@ -94,6 +94,6 @@ Vagrant.configure("2") do |config|
     # -f : ファイル名選択のオプション,ついていない場合,デフォルトのdocker-compose.ymlが実行される.
     # -d : バックグラウンドでの実行とする.
     sudo docker-compose -f docker-compose.nextjs.yml up -d
-    # sudo docker-compose -f docker-compose.mysql.yml up -d
+    sudo docker-compose -f docker-compose.mysql.yml up -d
   SHELL
 end
