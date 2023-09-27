@@ -61,8 +61,8 @@ entity "users" {
     username    : VARCHAR  (50)  {UQ, NN}
     email       : VARCHAR  (255) {UQ}
     password    : VARCHAR  (255) {NN}
-    profile     : VARCHAR  (50)
-    details     : VARCHAR  (50)
+    profile     : VARCHAR  (255)
+    details     : VARCHAR  (255)
     created_at  : DATETIME       {NN}
     updated_at  : DATETIME       {NN}
     deleted_at  : DATETIME
