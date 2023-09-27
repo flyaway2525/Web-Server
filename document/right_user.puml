@@ -1,0 +1,90 @@
+@startuml
+title ログインシーケンス(メールアドレスを用いないシンプルなもの)
+
+ログイン : ログイン画面\nアカウント作成画面のリンクも用意
+アカウント作成 : ユーザーIDとパスワードのものを作成\nユーザーIDかぶりを許可しない
+アカウント作成成功 : アカウント作成成功と表示
+ログイン成功 : ログイン成功と表示
+ログイン失敗 : 原因を表示\n・未登録のID\n・パスワードが異なる\nアカウント作成画面へ誘導
+ログアウト : ログアウト
+
+[*] --> ログイン
+[*] --> アカウント作成
+ログイン --> ログイン成功
+ログイン -right-> ログイン失敗
+note bottom: 常識的に原因を表示しない方がいいが\nとりあえず作成するものなのでこの仕様で作成する.
+ログイン失敗 -right-> ログイン
+アカウント作成 --> アカウント作成 : 入力に誤りがある場合
+アカウント作成 --> アカウント作成成功
+アカウント作成成功 --> ログイン
+ログイン成功 --> ログアウト
+
+@enduml
+
+@startuml
+title メッセージ機能(特段書くことなし)
+
+participant クライアント as c
+participant サーバー as s
+database データベース as db
+== 一覧取得 ==
+c -> s : リクエスト
+s -> db : sql実行
+db --> s : 
+s -> c : レスポンス
+
+== メッセージ送信 ==
+c -> s : リクエスト
+s -> db : sql実行
+db --> s : 
+s -> c : レスポンス
+
+== メッセージ編集 ==
+c -> s : リクエスト
+s -> db : sql実行
+db --> s : 
+s -> c : レスポンス
+
+== メッセージ削除 ==
+c -> s : リクエスト
+s -> db : sql実行
+db --> s : 
+s -> c : レスポンス
+
+@enduml
+
+@startuml
+
+entity "users" {
+    + id : INT {PK, AUTO_INCREMENT}
+    --
+    username    : VARCHAR  (50)  {UQ, NN}
+    email       : VARCHAR  (255) {UQ}
+    password    : VARCHAR  (255) {NN}
+    profile     : VARCHAR  (50)
+    details     : VARCHAR  (50)
+    created_at  : DATETIME       {NN}
+    updated_at  : DATETIME       {NN}
+    deleted_at  : DATETIME
+}
+
+entity "messages" {
+    + id : INT {PK, AUTO_INCREMENT}
+    --
+    channel_id : INT {FK, NN}
+    user_id : INT {FK, NN}
+    content : TEXT {NN}
+    created_at : DATETIME {NN}
+    updated_at : DATETIME {NN}
+    deleted_at  : DATETIME
+}
+
+note right of messages
+  Legend:
+  PK: Primary Key
+  UQ: Unique
+  NN: Not Null
+  AUTO_INCREMENT: Auto Increment
+end note
+
+@enduml
