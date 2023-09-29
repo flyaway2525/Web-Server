@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     profile VARCHAR(255),
     details VARCHAR(255),
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME
 );
 
@@ -31,8 +31,8 @@ CREATE TABLE IF NOT EXISTS messages (
     channel_id INT NOT NULL,
     user_id INT NOT NULL,
     content TEXT NOT NULL,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME,
 --    FOREIGN KEY (channel_id) REFERENCES channels(id), -- channelテーブルは別途作成予定
     FOREIGN KEY (user_id) REFERENCES users(id)
