@@ -1,0 +1,21 @@
+@startuml login sequence
+
+title ログインシーケンス
+
+participant クライアント as c
+participant サーバー as s
+database データベース as db
+== ログイン ==
+c -> s : username,password
+s -> db : 認証処理(hash値比較)
+s <-- db : 
+c <-[#red]- s : エラー処理(パスワード違い等)
+s -> s : Token発行
+c <-- s : CookieにToken登録
+
+== トークン認証(ユーザー名表示の例) ==
+c -> s : Token
+s -> s : Tokenからid,usernameを取得
+c <-- s : username
+
+@enduml
