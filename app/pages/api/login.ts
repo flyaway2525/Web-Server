@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'jsonwebtoken';
 import * as mysql from 'promise-mysql';
 import bcrypt from 'bcryptjs';
+import { customLog } from '../../utils/customLog';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -20,17 +21,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     // ユーザーの存在確認
     if(!userinfo) {
-      console.log("login.ts 401 user not found");
+      customLog("401 user not found");
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     // パスワードの確認
     const passwordCheck : Boolean = await bcrypt.compare(req.body.password, userinfo.password);
     if(!passwordCheck) {
-      console.log("login.ts");
-      console.log("input password        : " + req.body.password);
-      console.log("hashed password on DB : " + userinfo.password);  
-      console.log("401 password incorrect");
+      customLog("401 password incorrect");
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
@@ -39,7 +37,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const token = jwt.sign(tokenPayload, '', { algorithm: 'none' }); // 署名なしのJWT ※TODO : 署名
     res.status(200).json({ token: token });
   } else {
-    console.log("login.ts 405");
+    customLog("405 Server Error");
     res.status(405).end();
   }
 };

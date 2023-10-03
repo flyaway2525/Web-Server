@@ -15,9 +15,6 @@ const News: React.FC = () => {
     fetchToken();
   }, []);
 
-  console.log("news.tsx token");
-  console.log(token);
-
   return (
     <div>
       <header>
