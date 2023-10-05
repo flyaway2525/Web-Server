@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import * as mysql from 'promise-mysql';
 import bcrypt from 'bcryptjs';
 import { customLog } from '../../utils/customLog';
+import { UserTokenProps } from '../../utils/userTokenProps';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -32,9 +33,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // 認証成功,トークンを返す
-    const tokenPayload = { id: userinfo.id, username: userinfo.username };
-    const token = jwt.sign(tokenPayload, '', { algorithm: 'none' }); // 署名なしのJWT ※TODO : 署名
+    // 認証成功,ユーザーのトークンに入れる情報作成
+    const tokenPayload: UserTokenProps = new UserTokenProps(userinfo.id,userinfo.username,"USER_ROLE");
+    // トークン発行
+    const token = jwt.sign(tokenPayload.toJson(), '', { algorithm: 'none' }); // 署名なしのJWT ※TODO : 署名入りトークンの作成
     res.status(200).json({ token: token });
   } else {
     customLog("405 Server Error");

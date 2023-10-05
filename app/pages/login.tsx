@@ -1,8 +1,12 @@
+import { getRedirectEnum, getRedirectMessage } from '@/utils/redirected_case';
+import { useRouter } from 'next/router';
 import { useState, FormEvent } from 'react';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const router = useRouter();
+  const { redirect_case } = router.query;
 
   // login時の処理
   const handleLogin = async (e: FormEvent) => {
@@ -36,6 +40,7 @@ const Login: React.FC = () => {
 
   return (
     <div>
+    {redirect_case && <div>{getRedirectMessage(getRedirectEnum(redirect_case))}</div>}
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input

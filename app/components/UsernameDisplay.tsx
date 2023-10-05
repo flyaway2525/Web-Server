@@ -9,7 +9,7 @@ type UsernameDisplayProps = {
 const UsernameDisplay: React.FC<UsernameDisplayProps> = ({ token }) => {
     // トークンをデコードしてユーザー情報を取得
     const decoded : any = token ? decodeToken(token) : null;
-    const username = decoded?.username || 'ゲスト';
+    const username = decoded?.userName || 'ゲスト';
     return <span>{username}さん</span>;
 };
 

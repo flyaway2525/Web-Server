@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import UsernameDisplay from '../components/UsernameDisplay';
+import Link from 'next/link';
 
 const News: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
@@ -24,6 +25,7 @@ const News: React.FC = () => {
       <div>
         <h1>News Contents</h1>
         {/* ニュースのリストや詳細など */}
+        <Link href="/memberOnly">Go to Member-Only Page</Link>
       </div>
     </div>
   );
