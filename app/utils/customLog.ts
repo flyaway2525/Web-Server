@@ -48,7 +48,7 @@ export function customLog(message: string, category: string):void;
 
 export function customLog(message: string, category?: string):void {
     // カテゴリー未登録は,DEBUGとして出力
-    if (!category) category = DEBUG_LOG_CATEGORY.DEBUG.toString();
+    if (!category) category = DEBUG_LOG_CATEGORY[DEBUG_LOG_CATEGORY.DEBUG];
 
     // ALL_LOGSの場合,全てのログを出力する.
     if (log_level == DEBUG_LOG_LEVEL.ALL_LOGS) {
