@@ -16,7 +16,9 @@ const Signup: React.FC = () => {
 
     if (response.ok) {
       console.log('Signup successful');
+      // TODO : Signup成功時,成功画面表示
     } else {
+      // TODO : Signup失敗時,失敗内容に応じたテキストを表示
       console.error('Signup failed');
     }
   };
