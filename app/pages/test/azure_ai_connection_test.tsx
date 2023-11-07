@@ -36,7 +36,8 @@ async function fetchData() {
     body: body
   };
 
-  const response = await fetch(AZURE_AI_SERVER_URL, requestOptions);
+  // ビルドするたびにAPIが走るので,AZURE_AI_SERVER_URLを変数でなくすことで回避中
+  const response = await fetch("AZURE_AI_SERVER_URL", requestOptions);
   if (response.ok) {
     data = await response.json();
     console.log(data);
