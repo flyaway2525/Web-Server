@@ -4,6 +4,7 @@ import { ChatContainer, MainContainer, Message, MessageInput, MessageList, Messa
 // TODO　: 環境変数周りの整備
 import {API_KEY, AZURE_AI_SERVER_URL} from '../test/azure_ai_connection_test';
 import { v4 as uuidv4 } from 'uuid';
+import { customLog } from '@/utils/customLog';
 
 // ページコンポーネント
 function ChatWithAiTest() {
@@ -52,7 +53,7 @@ function ChatWithAiTest() {
   // Pageコンポーネント
   return (
     <div>
-      <h1>Chat UI Kit for react</h1>
+      <h1>Interaction with ChatGPT 3.5</h1>
       <div style={{ position: "relative", height: "500px" }}>
         <MainContainer>
           <ChatContainer>
@@ -74,44 +75,30 @@ function ChatWithAiTest() {
 
 // APIを叩いてレスポンスを受ける.
 async function fetchData(context:string): Promise<string> {
-    let data: any; // OpenAIのレスポンスのJSON型,適切な型リストが見つかり次第実装予定
-
-    const headers = new Headers();
-    headers.append("api-key", API_KEY);
-    headers.append("Content-Type", "application/json");
-
-    const body = JSON.stringify({
-        "messages": [
-          {
-            "role": "system",
-            "content": context
-          }
-        ],
-        "temperature": 0.7,
-        "top_p": 0.95,
-        "frequency_penalty": 0,
-        "presence_penalty": 0,
-        "max_tokens": 800,
-        "stop": null
-      }
-    );
-
-    const requestOptions = {
-      method: "POST",
-      headers: headers,
-      body: body
-    };
-
-    const response = await fetch(AZURE_AI_SERVER_URL, requestOptions);
-    if (response.ok) {
-      data = await response.json();
-      console.log("response.ok" + data.choices[0].message.context);
+  let data: any = undefined;
+  try{
+    data = await fetch('/api/getMessageFromChatGPT35', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: context }),
+    });
+  }catch(e){
+    console.log("Error : chat_ai_test.tsx is bad function");
+    console.log(e);
+    return "API接続エラーです.";
+  }
+  if (data.ok) {
+    const response = await data.json();
+    if(response.success) {
+      return response.message;
     } else {
-      console.log('Network response was not ok');
-      return "Network response was not ok";
+      customLog("response message is empty" + response.message);
+      return response.message;
     }
-
-    return data.choices[0].message.content;
+  } else {
+    customLog("response was failed");
+    return "エラーです";
+  }   
 }
 
 export default ChatWithAiTest;
