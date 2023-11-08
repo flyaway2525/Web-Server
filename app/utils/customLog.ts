@@ -43,10 +43,24 @@ function getCallerInfo() {
     return "No Caller Info";
 }
 
-export function customLog(message: string):void;
-export function customLog(message: string, category: string):void;
-
-export function customLog(message: string, category?: string):void {
+/**
+ * 開発用の専用ログです.ログ出力レベルを調整できます.  
+ *　@param message ログ出力時の内容を記入します.
+ * Object型に対応しました.
+ */
+export function customLog(message: any):void;
+/**
+ * 開発用の専用ログです.ログ出力レベルを調整できます.  
+ * @param message ログ出力時の内容を記入します.
+ * @param {string} category ログのカテゴリーを記入します.
+ * カテゴリリストは以下になります.
+ * - ERROR       : エラー発生時のログ,常に表示され,リリース後も必要
+ * - DATABASE    : データベースアクセスに関するログ,リリース後,アクセスログを取る際に使用する可能性あり.
+ * - FUNCTION    : Webサーバー固有のログ,リリース後はクライアント側で表示されるか注意する.
+ * - DEBUG       : デバッグ用,リリース時は無視される.また,カテゴリー未入力の場合これに当たる.
+ */
+export function customLog(message: any, category: string):void;
+export function customLog(message: any, category?: string):void {
     // カテゴリー未登録は,DEBUGとして出力
     if (!category) category = DEBUG_LOG_CATEGORY[DEBUG_LOG_CATEGORY.DEBUG];
 
@@ -62,7 +76,12 @@ export function customLog(message: string, category?: string):void {
 
     // ログ出力部分
     try {
-        console.log(category + " " + getCallerInfo() + " : " + message);
+        if(typeof message == "object") {
+            console.log(category + " " + getCallerInfo() + " : " + "Object");
+            console.log(message);
+        }else{
+            console.log(category + " " + getCallerInfo() + " : " + message);
+        }
     } catch (e) {
         console.log("Error : customLog.ts is bad function");
         console.log(e);
