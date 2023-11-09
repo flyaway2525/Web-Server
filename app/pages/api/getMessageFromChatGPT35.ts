@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import {API_KEY, AZURE_AI_SERVER_URL} from '../test/azure_ai_connection_test';
 import { customLog } from '@/utils/customLog';
+
+const API_KEY: string = process.env.AZURE_AI_API_KEY_CHATGPT35!;
+const AZURE_AI_SERVER_URL: string = process.env.AZURE_AI_SERVER_URL!;
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {

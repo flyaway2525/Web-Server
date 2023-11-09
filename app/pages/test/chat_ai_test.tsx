@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import { ChatContainer, MainContainer, Message, MessageInput, MessageList, MessageModel } from '@chatscope/chat-ui-kit-react';
-// TODO　: 環境変数周りの整備
-import {API_KEY, AZURE_AI_SERVER_URL} from '../test/azure_ai_connection_test';
 import { v4 as uuidv4 } from 'uuid';
 import { customLog } from '@/utils/customLog';
 
