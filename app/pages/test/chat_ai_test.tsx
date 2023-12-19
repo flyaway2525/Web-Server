@@ -75,7 +75,7 @@ function ChatWithAiTest() {
 async function fetchData(context:string): Promise<string> {
   let data: any = undefined;
   try{
-    data = await fetch('/api/getMessageFromChatGPT35', {
+    data = await fetch('/api/getCustomMessageFromChatGPT', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: context }),

@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { customLog } from '@/utils/customLog';
+import { AIRequest } from '@/utils/chat_gpt/ai_requset';
 
 const API_KEY: string = process.env.AZURE_AI_API_KEY_CHATGPT35!;
 const AZURE_AI_SERVER_URL: string = process.env.AZURE_AI_SERVER_URL!;
@@ -14,28 +15,24 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(200).json({ success: false, message: "request message is empty" });
     }
 
-    // OpenAIのレスポンスのJSON型,適切な型リストが見つかり次第実装予定 -> ai_requestを実装により解決,テストケースとして残す.
+    // OpenAIのレスポンスのJSON型,適切な型リストが見つかり次第実装予定
     let data: any;
     const headers = new Headers();
     headers.append("api-key", API_KEY);
     headers.append("Content-Type", "application/json");
+    const ai_request = new AIRequest();
+    ai_request.model = "gpt-3.5-turbo";
+    ai_request.messages = [
+      { role: "system", content: "システムメッセージ" },
+      { role: "user", content: requestMessage }
+      //{ role: "assistant", content: "システムメッセージ" },
+      //{ role: "user", content: "システムメッセージ" },
+    ];
 
-    const body = JSON.stringify({
-      "messages": [
-        {
-        "role": "system",
-        "content": requestMessage
-        }
-      ],
-      "temperature": 0.7,
-      "top_p": 0.95,
-      "frequency_penalty": 0,
-      "presence_penalty": 0,
-      "max_tokens": 800,
-      "stop": null
-    });
+    const body = ai_request.toJSON();
+    customLog(body,"DEBUG");
 
-    const requestOptions = {
+    let requestOptions = {
       method: "POST",
       headers: headers,
       body: body
@@ -45,7 +42,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       response = await fetch(AZURE_AI_SERVER_URL, requestOptions);
     }catch(e){
-      console.log("Error : getMessageFromChatGPT35.ts is bad function");
+      console.log("Error : getCustomMessageFromChatGPT.ts is bad function");
       console.log(e);
     }
     let responseMessage: string = "";
